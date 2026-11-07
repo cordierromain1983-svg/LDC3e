@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ligue des Savoirs – 2nde Bac Pro Sécurité</title>
+<meta name="theme-color" content="#0b1640">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ligue Savoirs">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f6fb;--card:#fff;--tx:#12203a;--mut:#5a6785;--bd:#dde3f0;--acc:#1b2d6b;--h1:#d9a400;--h2:#2f6fe0;--h3:#1f9d62;--h4:#d6403f;--win:#1f9d62;--draw:#7a869f;--loss:#d6403f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0c1224;--card:#16203b;--tx:#eaf0ff;--mut:#9aa8c9;--bd:#27345a;--acc:#8fb0ff;--h1:#f2c230;--h2:#5b95ff;--h3:#3fc388;--h4:#ff6b6a;--win:#2fae72;--draw:#6c7899;--loss:#e5534f}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0c1224;--card:#16203b;--tx:#eaf0ff;--mut:#9aa8c9;--bd:#27345a;--acc:#8fb0ff;--h1:#f2c230;--h2:#5b95ff;--h3:#3fc388;--h4:#ff6b6a;--win:#2fae72;--draw:#6c7899;--loss:#e5534f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+main{max-width:960px;margin:0 auto;padding:16px}
+header{text-align:center;padding:8px 0 4px}
+header svg{width:210px;max-width:60%;height:auto}
+h1{margin:6px 0 2px;font-size:1.7rem;letter-spacing:.04em}
+.sub{color:var(--mut);margin:0 0 8px}
+h2{font-size:1.2rem;margin:28px 0 10px;color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px}
+.leg{font-size:.82rem;color:var(--mut)}
+.empty{color:var(--mut);text-align:center;padding:22px 14px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+button{padding:8px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--acc);font-weight:600;cursor:pointer;font:inherit;font-size:.9rem}
+button:hover{border-color:var(--acc)}
+/* Barre d'état */
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+.grow{flex:1}
+.st{font-size:.82rem;color:var(--mut)}
+.st::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mut);margin-right:6px;vertical-align:middle}
+.st.ok::before{background:var(--win)}.st.warn::before{background:var(--h1)}.st.err::before{background:var(--loss)}
+/* Matchs */
+.prog{font-size:.82rem;color:var(--mut);margin:0 0 8px}
+.mts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:6px}
+.mt{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg)}
+.mt .pa{text-align:right}.mt .w{font-weight:700}
+.sc{font-variant-numeric:tabular-nums;font-weight:700;min-width:3.8em;text-align:center;padding:2px 6px;border-radius:6px;background:var(--card);border:1px solid var(--bd)}
+.mt:not(.done) .sc{color:var(--mut);font-weight:400}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:baseline;flex:none}
+.dot.r{margin:0 0 0 6px}
+details{margin-top:12px}summary{cursor:pointer;font-weight:600;color:var(--acc)}
+details>.mts,details>div{margin-top:10px}
+/* Classement */
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+td,th{border:1px solid var(--bd);padding:6px 8px;text-align:left}
+th{background:var(--card)}
+table.rk td,table.rk th{text-align:center;padding:5px 6px}
+table.rk td:nth-child(2){text-align:left;white-space:nowrap}
+table.rk td:last-child{white-space:nowrap}
+.z1{background:color-mix(in srgb,var(--h1) 18%,transparent)}
+.z2{background:color-mix(in srgb,var(--h2) 12%,transparent)}
+tr.c1 td{border-bottom:3px solid var(--h1)}tr.c2 td{border-bottom:3px solid var(--h2)}
+tr.meRow td:nth-child(2){font-weight:700;text-decoration:underline;text-decoration-color:var(--acc);text-underline-offset:3px}
+.lg{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 8px}
+.lg span{display:inline-flex;align-items:center;gap:6px}
+.lg i{display:inline-block;width:12px;height:12px;border-radius:3px}
+.k1{background:var(--h1)}.k2{background:var(--h2)}.k3{background:var(--bd)}
+.fm{display:inline-flex;width:1.5em;height:1.5em;align-items:center;justify-content:center;border-radius:50%;font-size:.7rem;font-weight:700;color:#fff;margin-right:2px;font-style:normal}
+.fV{background:var(--win)}.fN{background:var(--draw)}.fD{background:var(--loss)}
+/* Fiche joueur */
+select{width:100%;padding:10px;font-size:1rem;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.me{font-size:1.2rem;font-weight:700;margin:14px 0 6px}
+.kpis{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.kpi{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:4px 10px;font-size:.86rem}
+.kpi b{font-size:1rem}
+.nextc{border:1px solid var(--bd);border-left:6px solid var(--c);border-radius:10px;padding:10px 12px;margin:0 0 12px;background:var(--bg)}
+.nextc small{display:block;color:var(--mut);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+.nextc b{font-size:1.1rem}
+.rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:8px}
+.row{display:flex;align-items:center;gap:10px;border:1px solid var(--bd);border-left:6px solid var(--c);border-radius:8px;padding:8px 10px;background:var(--bg)}
+.row.next{outline:2px solid var(--acc);outline-offset:1px}
+.j{font-weight:700;min-width:30px;color:var(--mut)}
+.op small{display:block;font-size:.72rem;color:var(--c);font-weight:700}
+.rs{margin-left:auto;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:700}
+.rs.todo{color:var(--mut);font-weight:400;font-size:.85rem}
+/* Stats */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
+.tile{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px}
+.tile .tl{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.tile .tn{font-weight:700;font-size:1.05rem;margin:4px 0 2px}
+.tile .tv{font-size:.85rem;color:var(--acc);font-weight:600}
+/* Phase finale */
+.br{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px;min-width:820px}
+.col{display:flex;flex-direction:column}
+.col h4{margin:0 0 8px;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);text-align:center}
+.cm{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:10px}
+.km{border:1px solid var(--bd);border-radius:8px;background:var(--bg);font-size:.84rem;overflow:hidden}
+.km .p{display:flex;align-items:center;gap:6px;padding:5px 8px}
+.km .p+.p{border-top:1px solid var(--bd)}
+.km .p.w{font-weight:700;background:color-mix(in srgb,var(--h1) 16%,transparent)}
+.km .p.ph{color:var(--mut);font-style:italic}
+.km .s{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700}
+.sd{color:var(--mut);font-size:.72rem;min-width:1.4em}
+.tie{font-size:.72rem;color:var(--h4);padding:3px 8px;border-top:1px solid var(--bd)}
+.champ{border:2px solid var(--h1);border-radius:12px;padding:14px 10px;text-align:center;font-weight:700;background:color-mix(in srgb,var(--h1) 12%,transparent)}
+.champ.ph{border-style:dashed;color:var(--mut);font-weight:400;font-style:italic}
+.champ span{display:block;font-size:1.6rem}
+/* Calendrier */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{padding:6px 11px}
+.tabs button.on{background:var(--acc);color:var(--card);border-color:var(--acc)}
+.tabs button.ok::after{content:" ✓";font-weight:400}
+/* Chapeaux */
+.hats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px}
+.hat{background:var(--card);border:1px solid var(--bd);border-top:6px solid var(--c);border-radius:12px;padding:12px 14px}
+.hat h3{margin:0 0 6px;font-size:1rem;color:var(--c)}
+.hat ol{margin:0;padding-left:20px}
+.rules h3{font-size:.95rem;margin:16px 0 4px}.rules h3:first-of-type{margin-top:12px}
+.rules ul{margin:0;padding-left:20px}.rules li{margin:2px 0}
+code{font-size:.85em;background:var(--bg);border:1px solid var(--bd);border-radius:4px;padding:0 4px}
+footer{text-align:center;color:var(--mut);font-size:.8rem;margin:26px 0 8px}
+/* Installation de l'appli */
+#installBtn{display:inline-flex;align-items:center;gap:8px;margin:6px 0 4px;padding:11px 20px;border-radius:999px;border:none;background:linear-gradient(135deg,#ffe082,#c58a00);color:#0b1640;font-size:1rem;font-weight:700;box-shadow:0 3px 10px color-mix(in srgb,#c58a00 35%,transparent)}
+#installBtn:hover{filter:brightness(1.05)}
+#installBtn[hidden]{display:none}
+#inst{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:16px;background:rgba(5,10,30,.55)}
+#inst[hidden]{display:none}
+#inst .box{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:16px;padding:18px 18px 14px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+#inst h3{margin:0 0 10px;font-size:1.1rem;color:var(--acc)}
+#inst ol{margin:0 0 12px;padding-left:22px}#inst li{margin:6px 0}
+#inst .note{font-size:.84rem;color:var(--mut);margin:0 0 12px}
+#inst .ic{display:inline-flex;align-items:center;justify-content:center;min-width:1.7em;height:1.7em;padding:0 4px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);font-weight:700;vertical-align:middle}
+#inst button{width:100%}
+@media (min-width:600px){#inst{align-items:center}}
+/* Mode projection */
+#proj{position:fixed;inset:0;z-index:50;background:var(--bg);overflow:auto;padding:16px 28px;font-size:clamp(13px,min(1.4vw,1.85vh),28px)}
+#proj .pjh{display:flex;align-items:center;gap:16px;margin-bottom:10px}
+#proj .pjh h1{font-size:1.8em;margin:0}
+#proj .pjh .grow{flex:1}
+#proj .pj{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:start}
+#proj h2{font-size:1.15em;margin:6px 0 10px}
+#proj table{font-size:1em}
+#proj table.rk td,#proj table.rk th{padding:.3em .5em}
+#proj .mts{grid-template-columns:1fr}
+#proj .mt{padding:.35em .6em}
+#proj .fm{font-size:.62em}
+#proj button{font-size:.8em}
+@media (max-width:820px){#proj .pj{grid-template-columns:1fr}}
+@media (max-width:520px){main{padding:12px}h1{font-size:1.45rem}.mt{gap:6px;padding:6px 8px;font-size:.92rem}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<svg viewBox="0 0 240 260" role="img" aria-label="Logo Ligue des Savoirs">
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c4bb8"/><stop offset="1" stop-color="#0d1a4d"/></linearGradient>
+<linearGradient id="o" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe082"/><stop offset="1" stop-color="#c58a00"/></linearGradient>
+<path id="s" d="M0-11 3.2-3.5 11-3.5 4.8 1.5 7 9 0 4.5-7 9-4.8 1.5-11-3.5-3.2-3.5Z"/>
+</defs>
+<circle cx="120" cy="115" r="105" fill="url(#g)" stroke="url(#o)" stroke-width="6"/>
+<circle cx="120" cy="115" r="92" fill="none" stroke="#ffe082" stroke-width="1.5" stroke-dasharray="3 5"/>
+<g fill="url(#o)">
+<use href="#s" x="120" y="34"/><use href="#s" x="177" y="58"/><use href="#s" x="201" y="115"/><use href="#s" x="177" y="172"/>
+<use href="#s" x="120" y="196"/><use href="#s" x="63" y="172"/><use href="#s" x="39" y="115"/><use href="#s" x="63" y="58"/>
+</g>
+<path d="M120 62 L164 78 V120 C164 146 144 162 120 172 C96 162 76 146 76 120 V78 Z" fill="#0b1640" stroke="url(#o)" stroke-width="4"/>
+<path d="M120 84 L128 106 L151 106 L133 120 L140 143 L120 129 L100 143 L107 120 L89 106 L112 106 Z" fill="url(#o)"/>
+<path d="M30 214 H210 L198 238 L210 258 H30 L42 238 Z" fill="url(#o)"/>
+<text x="120" y="244" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="21" letter-spacing="3" textLength="164" lengthAdjust="spacingAndGlyphs" fill="#0b1640">LIGUE DES SAVOIRS</text>
+</svg>
+<h1>LIGUE DES SAVOIRS</h1>
+<p class="sub">2nde Bac Pro Métiers de la Sécurité · Phase de ligue : 8 journées, 8 matchs chacun</p>
+<button id="installBtn" type="button" hidden>📲 Installer l'appli</button>
+</header>
+
+<div class="bar">
+ <span id="syncStatus" class="st">Chargement des résultats…</span>
+ <span class="grow"></span>
+ <button id="refreshScores" type="button">⟳ Actualiser</button>
+ <button id="projBtn" type="button">⛶ Projeter en classe</button>
+</div>
+
+<h2 id="curTitle">Journée en cours</h2>
+<div id="cur" class="card"></div>
+
+<h2>Classement</h2>
+<div class="lg leg" id="rkLeg"></div>
+<div id="rk"></div>
+
+<h2>Ma fiche joueur</h2>
+<div class="card">
+ <select id="pl" aria-label="Choisis ton nom"></select>
+ <div id="out"></div>
+</div>
+
+<h2>Stats &amp; trophées</h2>
+<div id="stats" class="tiles"></div>
+
+<h2>Phase finale</h2>
+<p class="leg" id="koNote"></p>
+<div id="ko" class="card scroll"></div>
+
+<h2>Calendrier &amp; résultats</h2>
+<div class="card">
+ <div id="jtabs" class="tabs" role="tablist" aria-label="Journées"></div>
+ <div id="jlist"></div>
+</div>
+
+<h2>Les 4 chapeaux</h2>
+<div class="hats" id="hats"></div>
+
+<h2>Règlement</h2>
+<details class="card rules" id="rules"><summary>Lire le règlement</summary><div id="rulesBody"></div></details>
+
+<h2>Espace enseignant</h2>
+<details class="card rules"><summary>Saisir les scores et gérer la phase finale</summary>
+<h3>Phase de ligue</h3>
+<p>Les scores se saisissent dans le Google Sheets, onglet <b>Saisie</b> (nombre de bonnes réponses, de 0 à 6). Le site recharge les résultats à chaque ouverture ; le bouton « Actualiser » les recharge à la demande. Les derniers résultats sont gardés sur l'appareil, pour que la page reste lisible même sans connexion.</p>
+<h3>Phase finale</h3>
+<p>Ajoute des lignes dans l'onglet <b>Saisie</b> avec, dans la colonne Journée, <code>Barrage</code>, <code>Quart</code>, <code>Demi</code> ou <code>Finale</code>, puis les deux joueurs et leurs scores. En cas d'égalité, ajoute une colonne <b>Vainqueur</b> et indique le nom du qualifié (après la question de départage). Le tableau de la phase finale se remplit tout seul.</p>
+<h3>Mode projection</h3>
+<p>Le bouton « Projeter en classe » affiche le classement et la journée en cours en grand, en plein écran. Il s'actualise tout seul toutes les 2 minutes. Touche Échap pour quitter.</p>
+</details>
+
+<footer>Chaque joueur affronte 2 adversaires de chaque chapeau, une fois chacun.</footer>
+</main>
+
+<div id="inst" hidden role="dialog" aria-modal="true" aria-labelledby="instT">
+ <div class="box"><h3 id="instT">Installer l'appli</h3><div id="instBody"></div><button id="instClose" type="button">J'ai compris</button></div>
+</div>
+
+<div id="proj" hidden>
+ <div class="pjh">
+  <h1>LIGUE DES SAVOIRS</h1><span class="grow"></span>
+  <span id="pjStatus" class="st"></span>
+  <button id="projClose" type="button">✕ Fermer</button>
+ </div>
+ <div class="pj">
+  <div><h2>Classement</h2><div id="pjRank"></div></div>
+  <div><h2 id="pjCurT"></h2><div id="pjCur"></div></div>
+ </div>
+</div>
+
+<script>
+/* ================= RÉGLAGES (modifiables) ================= */
+const RULES={
+ win:3, draw:1, loss:0,  // points : victoire, nul, défaite
+ direct:4,               // places 1 à 4 : qualifiés directement pour les quarts
+ playoff:12              // places 5 à 12 : barrages · au-delà : éliminés
+};
+const API="https://script.google.com/macros/s/AKfycbxgPSykjjhLT-OoZO8rCfklr1UI8zvN1L778opEf6USFBBRZpqcYp5XwwmeJ1i8fzJidA/exec";
+
+/* ================= JOUEURS ET CALENDRIER ================= */
+const H=[["Alix","Lucas","Félicia","Timéo","Nathan"],["Tom","Évan","Noélie","Bastien","Savelio"],["Gabin B","Alice","Lana","Elie","Augustin"],["Aziz","Gabin CDG","Raphaël","Lou","Jonas"]];
+const C=["var(--h1)","var(--h2)","var(--h3)","var(--h4)"];
+const S=["10-14 11-31 12-13 20-30 21-42 22-32 23-43 24-34 33-44 40-41","10-40 11-42 12-33 13-14 20-41 21-32 22-43 23-24 30-31 34-44","10-21 11-32 12-23 13-34 14-20 22-33 24-30 31-41 40-44 42-43","10-11 12-42 13-44 14-24 20-21 22-23 30-41 31-32 33-43 34-40","10-31 11-21 12-22 13-23 14-30 20-40 24-44 32-43 33-34 41-42","10-41 11-12 13-43 14-40 20-24 21-31 22-42 23-44 30-34 32-33","10-30 11-22 12-43 13-33 14-44 20-31 21-41 23-34 24-40 32-42","10-20 11-41 12-32 13-24 14-34 21-22 23-33 30-40 31-42 43-44"].map(s=>s.split(" ").map(m=>m.split("-")));
+
+/* ================= OUTILS ================= */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm=s=>String(s??"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const findCol=(heads,cands)=>heads.findIndex(h=>cands.includes(norm(h)));
+const nm=c=>H[c[0]-1][+c[1]];
+const hv=c=>C[c[0]-1];
+const CODES=H.flatMap((h,i)=>h.map((_,k)=>`${i+1}${k}`));
+const BYKEY={};CODES.forEach(c=>BYKEY[norm(nm(c))]=c);
+const store={
+ get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
+ set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const fmtDate=t=>new Date(t).toLocaleString("fr-FR",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const fmtDiff=d=>{const n=Number(d);return d!==""&&isFinite(n)&&n>0?"+"+n:esc(d)};
+const listNames=a=>a.length<=3?a.join(a.length===2?" et ":", "):a.slice(0,3).join(", ")+` +${a.length-3}`;
+
+/* ================= ÉTAT ================= */
+let R={};        // résultats de ligue : "j|codeA|codeB" -> [scoreA, scoreB]
+let KO=[];       // matchs de phase finale lus dans le tableur
+let CMP={};      // stats calculées par joueur
+let ST=[];       // classement affiché
+let hasData=false, fromSheet=false, failed=false, selJ=1, pickedJ=false;
+
+const getRes=(j,m)=>R[`${j}|${m[0]}|${m[1]}`];
+const playedIn=j=>S[j-1].filter(m=>getRes(j,m)).length;
+function currentJ(){for(let j=1;j<=S.length;j++)if(playedIn(j)<S[j-1].length)return j;return 0}
+
+/* ================= LECTURE DU TABLEUR ================= */
+function parseMatches(rows){
+ R={};KO=[];
+ if(!Array.isArray(rows))return;
+ let hr=-1,h=[];
+ for(let k=0;k<Math.min(rows.length,10);k++){
+  const cand=Array.isArray(rows[k])?rows[k]:[];
+  if(findCol(cand,["journee","jour"])>=0&&findCol(cand,["joueura"])>=0&&findCol(cand,["joueurb"])>=0){hr=k;h=cand;break}
+ }
+ if(hr<0)return;
+ const c={jour:findCol(h,["journee","jour"]),a:findCol(h,["joueura"]),b:findCol(h,["joueurb"]),
+  sa:findCol(h,["butsa","scorea"]),sb:findCol(h,["butsb","scoreb"]),played:findCol(h,["joue"]),
+  w:findCol(h,["vainqueur","gagnant","qualifie"])};
+ const cell=(r,i)=>i>=0?String(r[i]??"").trim():"";
+ const num=s=>Number(String(s).replace(",","."));
+ rows.slice(hr+1).forEach(r=>{
+  if(!Array.isArray(r))return;
+  const jr=cell(r,c.jour),a=cell(r,c.a),b=cell(r,c.b);
+  if(!jr||!a||!b)return;
+  const sa=cell(r,c.sa),sb=cell(r,c.sb),flag=cell(r,c.played);
+  const played=sa!==""&&sb!==""&&isFinite(num(sa))&&isFinite(num(sb))&&(!flag||/^(oui|yes|true|1|x|vrai)$/i.test(flag));
+  const j=Number(jr);
+  if(Number.isInteger(j)&&j>=1&&j<=S.length){
+   if(!played)return;
+   const ca=BYKEY[norm(a)],cb=BYKEY[norm(b)];if(!ca||!cb)return;
+   const m=S[j-1].find(x=>x.includes(ca)&&x.includes(cb));if(!m)return;
+   R[`${j}|${m[0]}|${m[1]}`]=m[0]===ca?[num(sa),num(sb)]:[num(sb),num(sa)];
+  }else{
+   const t=norm(jr);
+   const rd=t.includes("barr")?"B":t.includes("quart")?"Q":t.includes("demi")?"D":t.includes("fin")?"F":null;
+   if(!rd)return;
+   KO.push({r:rd,a:norm(a),b:norm(b),sa:played?num(sa):null,sb:played?num(sb):null,w:norm(cell(r,c.w))});
+  }
+ });
+}
+
+function compute(){
+ CMP={};
+ CODES.forEach(c=>CMP[c]={code:c,name:nm(c),hat:+c[0],mj:0,v:0,n:0,d:0,bp:0,bc:0,form:[],streak:0,best:0});
+ S.forEach((J,i)=>J.forEach(m=>{
+  const r=getRes(i+1,m);if(!r)return;
+  [[m[0],r[0],r[1]],[m[1],r[1],r[0]]].forEach(([c,f,a])=>{
+   const p=CMP[c],o=f>a?"V":f<a?"D":"N";
+   p.mj++;p.bp+=f;p.bc+=a;p[{V:"v",N:"n",D:"d"}[o]]++;p.form.push(o);
+   p.streak=o==="V"?p.streak+1:0;p.best=Math.max(p.best,p.streak);
+  });
+ }));
+ Object.values(CMP).forEach(p=>{p.diff=p.bp-p.bc;p.pts=p.v*RULES.win+p.n*RULES.draw+p.d*RULES.loss});
+}
+const computedOrder=()=>Object.values(CMP)
+ .sort((x,y)=>y.pts-x.pts||y.diff-x.diff||y.bp-x.bp||x.name.localeCompare(y.name,"fr"))
+ .map((p,i)=>({...p,rank:i+1}));
+
+function parseRank(rows){
+ if(!Array.isArray(rows)||!rows.length)return null;
+ let hr=-1,h=[];
+ for(let k=0;k<Math.min(rows.length,10);k++){
+  const cand=Array.isArray(rows[k])?rows[k]:[];
+  if(cand.findIndex(v=>norm(v).includes("joueur"))>=0){hr=k;h=cand;break}
+ }
+ if(hr<0)return null;
+ const idx={rang:findCol(h,["rang"]),joueur:h.findIndex(v=>norm(v).includes("joueur")),chapeau:findCol(h,["chapeau"]),
+  mj:findCol(h,["mj"]),v:findCol(h,["v"]),n:findCol(h,["n"]),d:findCol(h,["d"]),bp:findCol(h,["bp"]),bc:findCol(h,["bc"]),
+  diff:findCol(h,["diff"]),pts:findCol(h,["points","pts"])};
+ const out=rows.slice(hr+1).filter(r=>Array.isArray(r)&&String(r[idx.joueur]??"").trim()).map((r,i)=>{
+  const raw=String(r[idx.joueur]).trim(),code=BYKEY[norm(raw)]||null,base=code?CMP[code]:null;
+  const g=k=>idx[k]>=0&&r[idx[k]]!==""&&r[idx[k]]!=null?r[idx[k]]:(base?base[k]:"");
+  return {code,name:code?nm(code):raw,hat:Number(idx.chapeau>=0?r[idx.chapeau]:0)||(code?+code[0]:0),
+   rank:idx.rang>=0&&r[idx.rang]!==""?r[idx.rang]:i+1,mj:g("mj"),v:g("v"),n:g("n"),d:g("d"),bp:g("bp"),bc:g("bc"),
+   diff:g("diff"),pts:g("pts"),form:base?base.form:[]};
+ });
+ return out.length?out:null;
+}
+
+function apply(data){
+ parseMatches(data&&data.saisie);
+ compute();
+ const sheet=parseRank(data&&data.classement);
+ fromSheet=!!sheet;
+ ST=sheet||computedOrder();
+ hasData=true;failed=false;
+ renderAll();
+}
+
+/* ================= AFFICHAGE ================= */
+const formHTML=f=>f.slice(-5).map(o=>`<i class="fm f${o}" title="${{V:"Victoire",N:"Nul",D:"Défaite"}[o]}">${o}</i>`).join("")||'<span class="leg">–</span>';
+const noData=()=>failed?"Résultats indisponibles pour le moment. Réessaie avec « Actualiser »."
+ :"Chargement des résultats…";
+
+function matchHTML(j,m){
+ const r=getRes(j,m),[a,b]=m,wa=r&&r[0]>r[1],wb=r&&r[1]>r[0];
+ return `<div class="mt${r?" done":""}"><span class="pa${wa?" w":""}"><i class="dot" style="background:${hv(a)}"></i>${nm(a)}</span>`+
+  `<span class="sc">${r?`${r[0]} – ${r[1]}`:"à jouer"}</span>`+
+  `<span class="pb${wb?" w":""}">${nm(b)}<i class="dot r" style="background:${hv(b)}"></i></span></div>`;
+}
+const journeeHTML=j=>`<div class="mts">${S[j-1].map(m=>matchHTML(j,m)).join("")}</div>`;
+const curTitle=()=>{const cj=currentJ();return !hasData?"Journée en cours":cj?`Journée ${cj} en cours`:"Phase de ligue terminée"};
+
+function renderCurrent(){
+ $("curTitle").textContent=curTitle();
+ if(!hasData){$("cur").innerHTML=`<div class="empty">${noData()}</div>`;return}
+ const cj=currentJ(),j=cj||S.length;
+ let h=`<p class="prog">${cj?`${playedIn(j)} / ${S[j-1].length} matchs joués`:"Résultats de la dernière journée"}</p>`+journeeHTML(j);
+ if(cj>1)h+=`<details><summary>Résultats de la journée ${cj-1}</summary>${journeeHTML(cj-1)}</details>`;
+ $("cur").innerHTML=h;
+}
+
+function legendHTML(){
+ return `<span><i class="k1"></i>1–${RULES.direct} : quarts de finale directs</span>`+
+  `<span><i class="k2"></i>${RULES.direct+1}–${RULES.playoff} : barrages</span>`+
+  `<span><i class="k3"></i>${RULES.playoff+1}–${CODES.length} : éliminés</span>`;
+}
+function rankTable(compact){
+ if(!hasData)return `<div class="card empty">${noData()}</div>`;
+ const me=$("pl").value;
+ const head=compact?["#","Joueur","MJ","Diff","Pts","Forme"]:["#","Joueur","MJ","V","N","D","BP","BC","Diff","Pts","Forme"];
+ return `<div class="card scroll"><table class="rk"><tr>${head.map(x=>`<th>${x}</th>`).join("")}</tr>`+
+  ST.map((p,i)=>{
+   const z=i<RULES.direct?"z1":i<RULES.playoff?"z2":"z3",cut=i===RULES.direct-1?" c1":i===RULES.playoff-1?" c2":"";
+   const cells=compact?[esc(p.mj),fmtDiff(p.diff),`<b>${esc(p.pts)}</b>`,formHTML(p.form)]
+    :[esc(p.mj),esc(p.v),esc(p.n),esc(p.d),esc(p.bp),esc(p.bc),fmtDiff(p.diff),`<b>${esc(p.pts)}</b>`,formHTML(p.form)];
+   return `<tr class="${z}${cut}${p.code&&p.code===me?" meRow":""}"><td><b>${esc(p.rank)}</b></td>`+
+    `<td><span class="dot" style="background:${C[p.hat-1]||"var(--mut)"}"></span>${esc(p.name)}</td>${cells.map(x=>`<td>${x}</td>`).join("")}</tr>`;
+  }).join("")+`</table></div>`;
+}
+function renderRank(){$("rkLeg").innerHTML=legendHTML();$("rk").innerHTML=rankTable(false)}
+
+function renderFiche(){
+ const me=$("pl").value,o=$("out");
+ if(!me){o.innerHTML='<p class="leg">Choisis ton nom : tu verras tes matchs, tes scores, ton rang et ton prochain adversaire.</p>';return}
+ const p=CMP[me]||{v:0,n:0,d:0,pts:0,form:[]},st=ST.find(x=>x.code===me);
+ let next=-1;
+ const rows=S.map((J,i)=>{
+  const m=J.find(x=>x.includes(me)),first=m[0]===me,op=first?m[1]:m[0],r=getRes(i+1,m);
+  let res="",sc="";
+  if(r){const f=first?r[0]:r[1],a=first?r[1]:r[0];res=f>a?"V":f<a?"D":"N";sc=`${f} – ${a}`}
+  else if(next<0)next=i;
+  return {i,op,res,sc};
+ });
+ const rank=hasData&&st?st.rank:"–",pts=st?st.pts:p.pts;
+ let h=`<div class="me" style="color:${hv(me)}">${nm(me)} · Chapeau ${me[0]}</div>`+
+  `<div class="kpis"><span class="kpi">Rang <b>${esc(rank)}</b></span><span class="kpi">Points <b>${esc(pts)}</b></span>`+
+  `<span class="kpi">Bilan <b>${p.v}V ${p.n}N ${p.d}D</b></span><span class="kpi">Forme ${formHTML(p.form)}</span></div>`;
+ if(next>=0){const n=rows[next];h+=`<div class="nextc" style="--c:${hv(n.op)}"><small>Prochain match · Journée ${next+1}</small>contre <b>${nm(n.op)}</b> (Chapeau ${n.op[0]})</div>`}
+ else h+=`<div class="nextc" style="--c:var(--h1)"><small>Phase de ligue</small><b>Tous tes matchs de ligue sont joués</b></div>`;
+ h+=`<div class="rows">`+rows.map(x=>`<div class="row${x.i===next?" next":""}" style="--c:${hv(x.op)}"><span class="j">J${x.i+1}</span>`+
+  `<span class="op">${nm(x.op)}<small>Chapeau ${x.op[0]}</small></span>`+
+  (x.res?`<span class="rs">${x.sc} <i class="fm f${x.res}">${x.res}</i></span>`:`<span class="rs todo">${x.i===next?"prochain":"à jouer"}</span>`)+
+  `</div>`).join("")+`</div>`;
+ o.innerHTML=h;
+}
+
+function renderStats(){
+ const pl=Object.values(CMP).filter(p=>p.mj>0);
+ const tile=(l,n,v)=>`<div class="tile"><div class="tl">${l}</div><div class="tn">${n||"–"}</div><div class="tv">${v||"pas encore de match joué"}</div></div>`;
+ if(!hasData||!pl.length){$("stats").innerHTML=[["⚽ Meilleure attaque"],["🛡️ Meilleure défense"],["🔥 Plus longue série"],["⭐ Joueur de la journée"]].map(x=>tile(x[0])).join("");return}
+ const best=(arr,f,max)=>{const v=max?Math.max(...arr.map(f)):Math.min(...arr.map(f));return {v,names:arr.filter(p=>f(p)===v).map(p=>p.name)}};
+ const att=best(pl,p=>p.bp,true);
+ const def=best(pl,p=>Math.round(p.bc/p.mj*10)/10,false);
+ const ser=best(pl,p=>p.best,true);
+ let jj=0;for(let j=S.length;j>=1;j--)if(playedIn(j)>0){jj=j;break}
+ const perf=[];
+ S[jj-1].forEach(m=>{const r=getRes(jj,m);if(r){perf.push({name:nm(m[0]),f:r[0],d:r[0]-r[1]});perf.push({name:nm(m[1]),f:r[1],d:r[1]-r[0]})}});
+ const top=Math.max(...perf.map(x=>x.f)),topD=Math.max(...perf.filter(x=>x.f===top).map(x=>x.d));
+ const mvp=perf.filter(x=>x.f===top&&x.d===topD).map(x=>x.name);
+ $("stats").innerHTML=
+  tile("⚽ Meilleure attaque",listNames(att.names),`${att.v} bonnes réponses au total`)+
+  tile("🛡️ Meilleure défense",listNames(def.names),`${String(def.v).replace(".",",")} bonne${def.v>1?"s":""} réponse${def.v>1?"s":""} adverse${def.v>1?"s":""} par match`)+
+  tile("🔥 Plus longue série",ser.v>0?listNames(ser.names):"–",ser.v>0?`${ser.v} victoire${ser.v>1?"s":""} d'affilée`:"aucune victoire pour l'instant")+
+  tile(`⭐ Joueur de la J${jj}`,listNames(mvp),`${top} / 6 bonnes réponses`);
+}
+
+function renderKO(){
+ const done=S.every((J,i)=>playedIn(i+1)===J.length);
+ $("koNote").textContent=done?"Qualifiés issus du classement final de la phase de ligue."
+  :"Projection : voici le tableau si la phase de ligue s'arrêtait aujourd'hui.";
+ if(!hasData||ST.length<RULES.playoff){$("ko").innerHTML=`<div class="empty">${noData()}</div>`;return}
+ const P=n=>({name:ST[n-1].name,seed:n});
+ const find=(rd,x,y)=>KO.find(k=>k.r===rd&&((k.a===norm(x.name)&&k.b===norm(y.name))||(k.a===norm(y.name)&&k.b===norm(x.name))));
+ const play=(rd,x,y,phx,phy)=>{
+  const res={x,y,phx,phy,w:null};
+  if(!x||!y)return res;
+  const k=find(rd,x,y);if(!k)return res;
+  const rev=k.a!==norm(x.name);
+  res.sx=rev?k.sb:k.sa;res.sy=rev?k.sa:k.sb;
+  if(k.w)res.w=k.w===norm(x.name)?x:k.w===norm(y.name)?y:null;
+  if(!res.w&&res.sx!=null&&res.sy!=null&&res.sx!==res.sy)res.w=res.sx>res.sy?x:y;
+  res.tie=res.sx!=null&&res.sx===res.sy&&!res.w;
+  return res;
+ };
+ // Barrages : 5-12, 6-11, 7-10, 8-9 · Quarts : 1 vs (8/9), 4 vs (5/12), 3 vs (6/11), 2 vs (7/10)
+ const b=[play("B",P(5),P(12)),play("B",P(6),P(11)),play("B",P(7),P(10)),play("B",P(8),P(9))];
+ const bl=["5/12","6/11","7/10","8/9"].map(s=>`Vainqueur ${s}`);
+ const q=[play("Q",P(1),b[3].w,"",bl[3]),play("Q",P(4),b[0].w,"",bl[0]),play("Q",P(3),b[1].w,"",bl[1]),play("Q",P(2),b[2].w,"",bl[2])];
+ const d=[play("D",q[0].w,q[1].w,"Vainqueur QF1","Vainqueur QF2"),play("D",q[2].w,q[3].w,"Vainqueur QF3","Vainqueur QF4")];
+ const f=play("F",d[0].w,d[1].w,"Vainqueur DF1","Vainqueur DF2");
+ const side=(p,ph,s,w)=>p?`<div class="p${w===p?" w":""}"><span class="sd">${p.seed}</span>${esc(p.name)}<span class="s">${s!=null?s:""}</span></div>`
+  :`<div class="p ph"><span class="sd"></span>${ph}</div>`;
+ const box=m=>`<div class="km">${side(m.x,m.phx,m.sx,m.w)}${side(m.y,m.phy,m.sy,m.w)}${m.tie?'<div class="tie">Égalité : question de départage</div>':""}</div>`;
+ const col=(t,ms)=>`<div class="col"><h4>${t}</h4><div class="cm">${ms.map(box).join("")}</div></div>`;
+ $("ko").innerHTML=`<div class="br">${col("Barrages",[b[3],b[0],b[1],b[2]])}${col("Quarts",q)}${col("Demies",d)}${col("Finale",[f])}`+
+  `<div class="col"><h4>Champion</h4><div class="cm">${f.w?`<div class="champ"><span>🏆</span>${esc(f.w.name)}</div>`:'<div class="champ ph"><span>🏆</span>à conquérir</div>'}</div></div></div>`;
+}
+
+function renderCal(){
+ const cj=currentJ();
+ if(!pickedJ)selJ=cj||S.length;
+ $("jtabs").innerHTML=S.map((J,i)=>`<button type="button" role="tab" aria-selected="${selJ===i+1}" class="${selJ===i+1?"on":""}${playedIn(i+1)===J.length?" ok":""}" data-j="${i+1}">J${i+1}</button>`).join("");
+ $("jlist").innerHTML=`<p class="prog">Journée ${selJ} · ${playedIn(selJ)} / ${S[selJ-1].length} matchs joués</p>`+journeeHTML(selJ);
+}
+$("jtabs").addEventListener("click",e=>{const b=e.target.closest("button[data-j]");if(!b)return;selJ=+b.dataset.j;pickedJ=true;renderCal()});
+
+function renderRules(){
+ $("rulesBody").innerHTML=`<h3>Phase de ligue</h3><ul>
+  <li>20 joueurs répartis en 4 chapeaux. Chaque joueur dispute 8 matchs (un par journée) : 2 adversaires de chaque chapeau.</li>
+  <li>Un match = une série de 6 questions par joueur. Le score est le nombre de bonnes réponses (0 à 6).</li>
+  <li>Victoire : ${RULES.win} points · Nul : ${RULES.draw} point${RULES.draw>1?"s":""} · Défaite : ${RULES.loss} point.</li>
+  <li>En cas d'égalité au classement : différence (bonnes réponses données moins reçues), puis nombre de bonnes réponses.</li></ul>
+  <h3>Qualification</h3><ul>
+  <li>Places 1 à ${RULES.direct} : qualifiés directement pour les quarts de finale.</li>
+  <li>Places ${RULES.direct+1} à ${RULES.playoff} : barrages (5ᵉ contre 12ᵉ, 6ᵉ contre 11ᵉ, 7ᵉ contre 10ᵉ, 8ᵉ contre 9ᵉ).</li>
+  <li>Places ${RULES.playoff+1} à ${CODES.length} : éliminés.</li></ul>
+  <h3>Phase finale</h3><ul>
+  <li>Quarts : 1ᵉʳ contre le vainqueur 8/9, 2ᵉ contre le vainqueur 7/10, 3ᵉ contre le vainqueur 6/11, 4ᵉ contre le vainqueur 5/12.</li>
+  <li>Puis demi-finales et finale, en matchs à élimination directe.</li>
+  <li>En cas d'égalité, une question de départage désigne le qualifié.</li></ul>
+  <h3>Lexique</h3><ul><li><b>MJ</b> matchs joués · <b>V/N/D</b> victoires, nuls, défaites · <b>BP</b> bonnes réponses · <b>BC</b> bonnes réponses de l'adversaire · <b>Forme</b> 5 derniers résultats.</li></ul>`;
+}
+
+function renderProj(){
+ if($("proj").hidden)return;
+ $("pjRank").innerHTML=rankTable(true);
+ $("pjCurT").textContent=curTitle();
+ const cj=currentJ();
+ $("pjCur").innerHTML=hasData?`<div class="card">${journeeHTML(cj||S.length)}</div>`:`<div class="card empty">${noData()}</div>`;
+ $("pjStatus").textContent=$("syncStatus").textContent;$("pjStatus").className=$("syncStatus").className;
+}
+
+function renderAll(){renderCurrent();renderRank();renderFiche();renderStats();renderKO();renderCal();renderProj()}
+
+/* ================= INITIALISATION ================= */
+$("hats").innerHTML=H.map((h,i)=>`<div class="hat" style="--c:${C[i]}"><h3>Chapeau ${i+1}</h3><ol>${h.map(n=>`<li>${n}</li>`).join("")}</ol></div>`).join("");
+const pl=$("pl");
+pl.innerHTML='<option value="">– Sélectionne ton nom –</option>'+H.map((h,i)=>`<optgroup label="Chapeau ${i+1}">${h.map((n,k)=>`<option value="${i+1}${k}">${n}</option>`).join("")}</optgroup>`).join("");
+const saved=store.get("ldc3e_me");if(saved&&CODES.includes(saved))pl.value=saved;
+pl.onchange=()=>{store.set("ldc3e_me",pl.value);renderFiche();renderRank()};
+renderRules();
+
+function setStatus(t,cls){const s=$("syncStatus");s.textContent=t;s.className="st "+(cls||"");renderProj()}
+
+let loading=false;
+function loadScores(){
+ if(loading)return;loading=true;
+ setStatus(hasData?"Actualisation…":"Chargement des résultats…");
+ const cb="ldsReceive_"+Date.now(),script=document.createElement("script");
+ const done=()=>{loading=false;clearTimeout(timer);delete window[cb];script.remove()};
+ const fail=()=>{done();
+  if(hasData){const c=store.get("ldc3e_cache");setStatus(`Hors connexion : résultats du ${c&&c.t?fmtDate(c.t):"dernier chargement"}`,"warn")}
+  else{failed=true;setStatus("Impossible de charger les résultats.","err");renderAll()}};
+ const timer=setTimeout(fail,15000);
+ window[cb]=data=>{done();
+  try{
+   apply(data);
+   const t=Date.now();store.set("ldc3e_cache",{data,t});
+   setStatus(`Mis à jour ${fmtDate(t)}`+(fromSheet?"":" · classement recalculé depuis les scores"),"ok");
+  }catch(err){console.error(err);setStatus("Erreur lors de l'affichage des résultats.","err")}
+ };
+ script.src=API+"?callback="+cb+"&t="+Date.now();
+ script.onerror=fail;
+ document.head.appendChild(script);
+}
+$("refreshScores").onclick=loadScores;
+
+/* Mode projection */
+let projTimer=null;
+function openProj(){
+ $("proj").hidden=false;document.body.style.overflow="hidden";renderProj();
+ const el=document.documentElement;
+ if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});
+ projTimer=setInterval(loadScores,120000);
+}
+function closeProj(){
+ if($("proj").hidden)return;
+ $("proj").hidden=true;document.body.style.overflow="";clearInterval(projTimer);
+ if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});
+}
+$("projBtn").onclick=openProj;
+$("projClose").onclick=closeProj;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeProj()});
+document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement)closeProj()});
+
+/* Installation de l'appli */
+const ua=navigator.userAgent;
+const isIOS=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const isAndroid=/Android/.test(ua);
+const inApp=/Instagram|FBAN|FBAV|Snapchat|TikTok|musical_ly|Line\//.test(ua);
+const installed=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+let deferredPrompt=null;
+const ib=$("installBtn");
+if(!installed())ib.hidden=false;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;if(!installed())ib.hidden=false});
+window.addEventListener("appinstalled",()=>{ib.hidden=true;deferredPrompt=null;$("inst").hidden=true});
+function installHelp(){
+ let h;
+ if(inApp)h=`<p class="note">Tu es dans le navigateur d'une autre appli : l'installation n'y est pas possible.</p><ol>
+  <li>Touche le menu <span class="ic">⋯</span> en haut de l'écran.</li>
+  <li>Choisis « Ouvrir dans ${isIOS?"Safari":"le navigateur"} ».</li>
+  <li>Touche à nouveau « Installer l'appli ».</li></ol>`;
+ else if(isIOS)h=`<ol>
+  <li>Touche le bouton Partager <span class="ic">⬆︎</span> (en bas de l'écran dans Safari, parfois en haut).</li>
+  <li>Fais défiler et choisis « Sur l'écran d'accueil ».</li>
+  <li>Touche « Ajouter » : l'icône de la Ligue apparaît sur ton écran d'accueil.</li></ol>
+  <p class="note">Si tu ne vois pas « Sur l'écran d'accueil », ouvre d'abord la page dans Safari.</p>`;
+ else if(isAndroid)h=`<ol>
+  <li>Touche le menu <span class="ic">⋮</span> du navigateur (en haut à droite).</li>
+  <li>Choisis « Installer l'application » ou « Ajouter à l'écran d'accueil ».</li>
+  <li>Confirme : l'icône de la Ligue apparaît sur ton écran d'accueil.</li></ol>`;
+ else h=`<ol>
+  <li>Clique sur l'icône d'installation <span class="ic">⊕</span> à droite de la barre d'adresse,</li>
+  <li>ou ouvre le menu du navigateur et choisis « Installer Ligue des Savoirs ».</li></ol>
+  <p class="note">Fonctionne avec Chrome et Edge. Avec un autre navigateur, ajoute simplement la page à tes favoris.</p>`;
+ $("instBody").innerHTML=h;$("inst").hidden=false;$("instClose").focus();
+}
+ib.onclick=async()=>{
+ if(deferredPrompt){
+  deferredPrompt.prompt();
+  const r=await deferredPrompt.userChoice.catch(()=>null);
+  deferredPrompt=null;
+  if(r&&r.outcome==="accepted")ib.hidden=true;
+ }else installHelp();
+};
+$("instClose").onclick=()=>{$("inst").hidden=true};
+$("inst").addEventListener("click",e=>{if(e.target.id==="inst")$("inst").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("inst").hidden=true});
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+/* Démarrage : affiche d'abord les résultats gardés en mémoire, puis actualise */
+const cache=store.get("ldc3e_cache");
+if(cache&&cache.data){
+ try{apply(cache.data);setStatus(`Résultats du ${fmtDate(cache.t)} · actualisation…`)}catch(e){renderAll()}
+}else renderAll();
+loadScores();
+</script>
+</body>
+</html>
